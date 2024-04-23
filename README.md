@@ -1,6 +1,5 @@
 # computer-aided-sketching
 Trajectory sketching tool for user experience designers 
-# <a name="_toc366063815"></a><a name="_toc366063807"></a>**4 Evaluation of Previous Sketching Tool**
 ## <a name="_toc366063808"></a>**4.1 Introduction**
 The trajectories sketching tool used for this research was developed by Professor Chris Greenhalgh from the University of Nottingham. As mentioned before, the concept of trajectories can be a good aid for design user experience over different space, roles, time, and interfaces. Therefore, the designers may need to use trajectories sketching to explore their idea of user journey. 
 
