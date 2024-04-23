@@ -1,2 +1,2 @@
 # computer-aided-sketching
-Trajectory sketching tool for user designers 
+Trajectory sketching tool for user experience designers 
