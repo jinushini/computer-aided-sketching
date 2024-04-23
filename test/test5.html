@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>无标题页</title>
+    <script type="text/javascript">
+    function ShowMessage()
+    {
+        if(document.getElementById("txtName").value=="")
+        {
+            alert("please enter the password");
+            return false;
+        }
+        else if(document.getElementById("txtPwd").value=="")
+        {
+            alert("please enter the password！");
+            return false;
+        }
+         else if(document.getElementById("txtTel").value=="")
+        {
+            alert("please enter the password！");
+            return false;
+        }
+         else if(document.getElementById("txtEmail").value=="")
+        {
+            alert("please enter the password！");
+            return false;
+        }
+    }
+    </script>
+</head>
+<body>
+    name:<input id="txtName" type="text" />
+    <br />
+    pwd:<input id="txtPwd" type="text" />
+    <br />
+    Tel:<input id="txtTel" type="text" />
+    <br />
+    Email:<input id="txtEmail" type="text" />
+    <br />
+    <input id="Button1" type="button" value="save" onclick="return ShowMessage()" />
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Sketcher2</title>
+<link rel="StyleSheet" href="sketcher2.css" type="text/css">
+<style type="text/css">
+body {
+	background-color: #333;
+}
+</style> 
+<!-- media=screen,print, -->
+<script type="text/javascript" src="jquery-1.7.2.min.js"></script> 
+<!-- from https://raw.github.com/desandro/imagesloaded/master/jquery.imagesloaded.min.js -->
+<script type="text/javascript" src="jquery.imagesloaded.min.js"></script>
+<!-- <script type="text/javascript" src="paper-weiser.js"></script> -->
+<script type="text/javascript" src="paper-20130430.js"></script>
+<script type="text/javascript" src="sketchbook.js"></script>
+<script type="text/javascript" src="sketchertools.js"></script>
+<script type="text/javascript" src="import.js"></script>
+<script type="text/javascript" src="sketcher2.js"></script>
+<script type="text/javascript" src="BlobBuilder.js"></script>
+<script type="text/javascript" src="FileSaver.js"></script>
+<script type = "text/javascript">
+
+
+
+
+	function changeFont(ftSize){
+		document.getElementById("orphanText").style.fontSize=ftSize;
+	}
+</script>
+</head>
+<body>
+<div id="page" class="page">
+<h1>Sketcher2</h1>
+	<div class="indexHeader">
+		<div class="headerItem">
+			Sketchbook:
+			<input type="file" id="loadFile" name="files[]" accept="application/json" class="button"/>
+			<input type="button" value="Load" class="button" onclick="javascript:onLoad();"/>
+			<input type="button" value="Merge" class="button" onclick="javascript:onMerge();"/>
+			Filename:
+			<input type="text" value="sketch" id="filenameText"/>
+			<input type="button" value="Save" class="button" onclick="javascript:onSave();"/>
+			<input type="button" value="Clear All" class="button" onclick="javascript:onClearAll();"/>
+		</div>
+		<div class="headerItem">
+			<a href="help2.html" target="_blank">Help</a><span>(try using Chrome)</span>
+		</div>
+		<div class="footer"></div>
+	</div>
+	<!-- objects list -->
+	<div id="tabs" class="tabs">
+		<div class="tab" id="tabIndex" 
+			onclick="javascript:onShowIndex();"
+			>Index</div>
+		<div class="tab" id="tabSequences" 
+			onclick="javascript:onShowSequences();" 
+			>Sequences</div>
+		<div class="tab" id="newSketch" 
+			onclick="javascript:onNewObject();" 
+			>New Sketch</div>
+		<div class="footer"></div>
+	</div>
+	<!--  object index -->
+	<div id="index" class="index tabview" style="display:none">
+		<div id='indexHashtags' class="indexHeader">
+			<div class="headerItem">
+				<span class="label">Filter:</span><input type="text" id="indexFilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();"/>
+				<input type='button' value='Show All' class='button' onclick='javascript:onObjectFilterClear();'/>
+			</div>
+			<div id='indexHashtagsMarker'></div>
+			<div class="footer"></div>
+		</div>
+		<canvas id="indexCanvas" class="indexCanvas" ></canvas>								
+	</div>
+	<!-- sequences -->
+	<div id="sequences" class="index tabview">
+		<div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Sequences(1)</span>
+					</div>
+					<div class="headerItem">
+						<span class="label">Filter:</span><input type="text" id="sequences1FilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();" disabled/>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<div id="sequences1Div" class="sequencesDiv" ></div>								
+			</div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Sequences(2)</span>
+					</div>
+					<div class="headerItem">
+						<span class="label">Filter:</span><input type="text" id="sequences2FilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();" disabled/>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<div id="sequences2Div" class="sequencesDiv" >
+					<div id="addSequence" onclick="javascript:onNewSequence();">New Sequence</div>
+				</div>								
+			</div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Current frame view</span>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<canvas id="sequencesViewCanvas" class="sequencesViewCanvas" ></canvas>								
+			</div>
+		</div>
+	</div>
+	<!-- object editor -->
+	<div class="editor tabview" id="editor">
+		<!-- left column -->
+		<div class="editorLeft">
+			<!-- overview -->
+		  <table class="propertiesTable">
+			  <!-- <tr class="" id="orphanTextProperty"><td>New text</td>
+					<td><input type="text" width="20" id="orphanText"/></td>
+				</tr> -->
+			  <tr class="propertyTitle" >
+			    <td>Properties</td>
+			    <td><!-- Value -->
+			      <div class="propertiesShow" id="propertiesShowSelection">Selection</div>
+			      <div class="propertiesShow" id="propertiesShowNew">New Items</div></td>
+		      </tr>
+			  <tr class="property" id="textProperty">
+			    <td>Text</td>
+			    <td><input id="orphanText" type="text" width="20"/></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="showLabelProperty">
+			    <td>Show Label</td>
+			    <td><div class="option optionDefault optionSelected" id="showLabel_">None</div>
+			      <div class="option" id="showLabel_sketch">Sketch</div>
+			      <div class="option" id="showLabel_frame">Frame</div>
+			      <div class="option" id="showLabel_sketch_frame">Both</div></td>
+		      </tr>
+			  <!-- font size -->
+			  <tr class="property propertyDisabled" id="textSizeProperty">
+			    <td>Font Size</td>
+			    <td><!--<div class="option optionDefault optionSelected" id="textSize_12">12</div>
+						<div class="option" id="textSize_24">24</div>
+						<div class="option" id="textSize_48">48</div>
+						<div class="option" id="textSize_96">96</div>-->
+			      <select  name ="FtSize" onChange="changeFont(value)">
+			        <option value ="10px">10pt</option>
+			        <option value ="14px">14pt</option>
+			        <option value ="18px">18pt</option>
+			        <option value ="20px">20pt</option>
+			        <option value ="22px">22pt</option>
+		          </select></td>
+			    </select>
+		      </tr>
+			  <tr class="property propertyDisabled" id="textColorProperty">
+			    <td>Text Color</td>
+			    <td><div class="option optionDefault optionSelected" style="background-color:#000000" id="textColor_000000"></div>
+			      <div class="option" style="background-color:#ffffff" id="textColor_ffffff"></div>
+			      <div class="option" style="background-color:#808080" id="textColor_808080"></div>
+			      <div class="option" style="background-color:#ff0000" id="textColor_ff0000"></div>
+			      <div class="option" style="background-color:#00ff00" id="textColor_00ff00"></div>
+			      <div class="option" style="background-color:#0000ff" id="textColor_0000ff"></div>
+			      <div class="option" style="background-color:#ffff00" id="textColor_ffff00"></div></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="textVAlignProperty">
+			    <td>Text Align</td>
+			    <td><div class="option optionDefault optionSelected" id="textVAlign_above">Above</div>
+			      <div class="option" id="textVAlign_top">Top</div>
+			      <div class="option" id="textVAlign_middle">Mid</div>
+			      <div class="option" id="textVAlign_bottom">Bottom</div>
+			      <div class="option" id="textVAlign_below">Below</div></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="frameStyleProperty">
+			    <td>Style</td>
+			    <td><div class="option optionDefault optionSelected" id="frameStyle_">None</div>
+			      <div class="option" id="frameStyle_border">Border</div>
+			      <div class="option" id="frameStyle_fill">Fill</div>
+			      <div class="option" id="frameStyle_border_fill">Both</div></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="lineColorProperty">
+			    <td>Line Color</td>
+			    <td><div class="option optionDefault optionSelected" style="background-color:#000000" id="lineColor_000000"></div>
+			      <div class="option" style="background-color:#ffffff" id="lineColor_ffffff"></div>
+			      <div class="option" style="background-color:#808080" id="lineColor_808080"></div>
+			      <div class="option" style="background-color:#ff0000" id="lineColor_ff0000"></div>
+			      <div class="option" style="background-color:#00ff00" id="lineColor_00ff00"></div>
+			      <div class="option" style="background-color:#0000ff" id="lineColor_0000ff"></div>
+			      <div class="option" style="background-color:#ffff00" id="lineColor_ffff00"></div></td>
+		      </tr>
+			  <!--  line width -->
+			  <tr class="property propertyDisabled" id="lineWidthProperty">
+			    <td>Line Width</td>
+			    <td><div class="option optionDefault optionSelected" id="lineWidth_1">1</div>
+			      <div class="option" id="lineWidth_2">2</div>
+			      <div class="option" id="lineWidth_4">4</div>
+			      <div class="option" id="lineWidth_8">8</div></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="fillColorProperty">
+			    <td>Fill Color</td>
+			    <td><div class="option optionDefault optionSelected" style="background-color:#000000" id="fillColor_000000"></div>
+			      <div class="option" style="background-color:#ffffff" id="fillColor_ffffff"></div>
+			      <div class="option" style="background-color:#808080" id="fillColor_808080"></div>
+			      <div class="option" style="background-color:#ff0000" id="fillColor_ff0000"></div>
+			      <div class="option" style="background-color:#00ff00" id="fillColor_00ff00"></div>
+			      <div class="option" style="background-color:#0000ff" id="fillColor_0000ff"></div>
+			      <div class="option" style="background-color:#ffff00" id="fillColor_ffff00"></div></td>
+		      </tr>
+			  <tr class="property propertyDisabled" id="rescaleProperty">
+			    <td>Rescale</td>
+			    <td><div class="option optionDefault optionSelected" id="rescale_fit">Fit</div>
+			      <div class="option" id="rescale_stretch">Stretch</div></td>
+		      </tr>
+		  </table>
+			<p class="label">&nbsp;</p>
+		</div>
+		<!-- right / zoomable view -->
+	  <div class="editorDetail">
+			<p class="label">Detail (zoomable)</p>
+	    	<canvas id="objectDetailCanvas" class="detailCanvas" ></canvas>
+	    	<p class="label">&nbsp;</p>
+		</div>
+		<div id ="style2" >
+		  <p class="label">Overview</p>
+          <canvas id="objectOverviewCanvas" class="overviewCanvas" ></canvas>
+          <!-- hidden text -->
+          <p class="label">Description</p>
+          <!-- <canvas id="objectTextCanvas" class="textCanvas" ></canvas> -->
+          <textarea name="objectTextArea" cols="20" rows="6" wrap="soft" class='objectTextArea' id='objectTextArea'></textarea>
+          <table width="83%" class="sketchPropertiesTable">
+            <tr class="sketchProperty">
+              <td>Background</td>
+              <td><div class="action" id="setBackgroundAction">Set</div>
+                <div class="action" id="clearBackgroundAction">Clear</div></td>
+            </tr>
+            <tr class="sketchProperty" id="backgroundAlphaProperty">
+              <td>Fade</td>
+              <td><div class="alpha" style="background-color:#000000"></div>
+                <div class="alpha" style="background-color:#404040"></div>
+                <div class="alpha" style="background-color:#808080"></div>
+                <div class="alpha" style="background-color:#a0a0a0"></div>
+                <div class="alpha" style="background-color:#c0c0c0"></div>
+                <div class="alpha" style="background-color:#e0e0e0"></div></td>
+            </tr>
+          </table>
+		</div>
+		<div class="footer"></div>
+	</div>
+	<!-- common facilities -->
+	<div class="commonFacilities">
+
+		<div class="properties"></div>
+		<div style="width:80%;float:left">
+			<div class="actions">
+				<div class="action actionSelected" id="selectAction"><img src="select.png" title ="Select[Q]" /></div>
+				<div class="action" id="backAction"><img src="Arrow back.png" title ="Back[Backspace]" /></div>
+				<p class="actionLabel label">Sketch:</p>
+				<div class="action" id="panAction"><img src="select_pan.png" title ="Select&Pan[C]" /></div>
+				<div class="action" id="showAllAction"><img src="show-icon.png" title ="Show all[V]" /></div>
+				<div class="action"  id="zoomInAction"><img src="Zoom-In-icon.png" title ="Zoom-in[Z]" /></div>
+				<div class="action" id="zoomOutAction"><img src="zoom-out-icon.png" title ="Zoom-out[X]" /></div>
+				<div class="action actionDisabled" id="orderToBackAction"><img src="back-icon.png" title ="To back[W]" /></div>
+				<div class="action actionDisabled" id="addLineAction"><img src="Line-icon.png" title ="Line[A]" /></div>
+				<div class="action actionDisabled" id="addCurveAction" style='display:none'>Curve</div><!-- Todo fix and make visible -->
+				<div class="action actionDisabled" id="addTextAction"><img src="Font-icon.png" title ="Text[S]" /></div>
+				<div class="action actionDisabled" id="addFrameAction"><img src="frame_icon.png" title ="Frame[F]" /></div>
+				<div class="action actionDisabled" id="addCircleAction"><img src="circle-icon.png" title ="Circle[J]" /></div>
+				<p class="actionLabel label">Selection:</p>
+				<div class="action" id="editAction"><img src="open.png" title ="Open[E]" /></div>
+				<div class="action" id="moveAction"><img src="move-icon.png" title ="Move[E]" /></div>
+				<div class="action" id="copyAction"><img src="Copy-icon.png" title ="Copy[D]" /></div>
+				<div class="action" id="placeAction"><img src="link.png" title ="Link[D]" /></div>
+				<div class="action" id="deleteAction"><img src="delete.png" title ="Delete" /></div>
+			</div>
+
+			<div class="selectionHistory">
+				<!-- selection history -->
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Selection history</span>
+					</div>
+					<div class="headerItem">
+						Load image:<input type="button" class="button" value="From URL" onclick="javascript:onLoadImageFromURL()"/>
+						<input type="file" id="loadImage" name="imageFiles[]" accept="image/*" class="button"/>
+					</div>
+					<div class="footer"></div>
+				</div>
+				<canvas id="selectionCanvas" class="selectionCanvas" ></canvas>	
+			</div>
+		<div class="footer"></div>
+	</div>
+</div>
+</div>
+<div id="ppitest" style="width:1in;visible:hidden;padding:0px"></div>
+<div id="hiddenimages" style="display:none"></div>
+</body>
+</html>

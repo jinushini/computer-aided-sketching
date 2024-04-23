@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Sketcher2</title>
+<link rel="StyleSheet" href="sketcher2.css" type="text/css">
+<style type="text/css">
+body {
+	background-color: #e1dfdf;
+}
+
+</style> 
+<!--<script src="js/jquery.js"></script>
+<script src="js/script.js"></script>
+<!-- media=screen,print, -->
+<script type="text/javascript" src="jquery-1.7.2.min.js"></script> 
+<!-- from https://raw.github.com/desandro/imagesloaded/master/jquery.imagesloaded.min.js -->
+<script type="text/javascript" src="jquery.imagesloaded.min.js"></script>
+<!-- <script type="text/javascript" src="paper-weiser.js"></script> -->
+<script type="text/javascript" src="paper-20130430.js"></script>
+<script type="text/javascript" src="sketchbook.js"></script>
+<script type="text/javascript" src="sketchertools.js"></script>
+<script type="text/javascript" src="import.js"></script>
+<script type="text/javascript" src="sketcher2.js"></script>
+<script type="text/javascript" src="BlobBuilder.js"></script>
+<script type="text/javascript" src="FileSaver.js"></script>
+
+<script type = "text/javascript">
+
+var tar,b;
+
+var f = true; 
+
+
+
+function dropdown(dropdown){
+  var a = tar.offsetHeight;
+ 
+ 
+ a += dropdown*5;
+  if(a>=450){
+   clearInterval(b);
+  tar.style.height = "450px";
+     f = true;
+  }
+  else if(a<=30){
+   clearInterval(b);
+   
+   tar.style.height = "30px";
+   f = true;
+  } 
+  else tar.style.height = a + "px";
+ }
+function openclose(){
+ document.getElementById("hide").onclick = 
+ 
+ function(){
+   clearInterval(b);
+
+   if(tar.offsetHeight>=450)
+      b=setInterval("dropdown(-1)",5);
+   else
+      b = setInterval("dropdown(1)" , 5); 
+  }
+}
+window.onload = function()
+{
+ tar = document.getElementById("box")
+ tar.style.height = "30px";
+ openclose();
+}
+
+function TextCheck()
+    {
+        if(document.getElementById("orphanText").value=="")
+        {
+            alert("Please enter the text in Properties!");
+            return false;
+        }
+	}
+	
+var i=0;
+
+function FrameCheck()
+    {
+        if(i==0)
+        {
+            alert("Please choose the frame style in properties!");
+            
+        }
+		else{
+		     return true;
+			 }
+		
+		i+=1;
+	}
+function ContentCheck()
+    {
+        if(document.getElementById("loadFile").value=="")
+        {
+            alert("Please choose the file first!");
+            return false;
+        }
+	}
+
+function ImageCheck()
+    {
+        if(i==0)
+        {
+            alert("Click the copy button then drag your mouse on canvas !");
+            
+        }
+		else{
+		     return true;
+			 }
+		
+		i+=1;
+	}
+</script>
+</head>
+<body>
+<div id="page" class="page">
+<img src="background3.png" width="850" height="90"  alt="Title"/>
+
+
+	<div class="indexHeader">
+		<div class="headerItem">
+			Sketchbook:
+			<input type="file" id="loadFile" name="files[]" accept="application/json" class="button"/>
+			<input type="button" value="Load" class="button" onclick="javascript:onLoad(); return ContentCheck();"/><!--javascript:onLoad();-->
+			<input type="button" value="Merge" class="button" onclick="javascript:onMerge();"/>
+			Filename:
+			<input type="text" value="sketch" id="filenameText"/>
+			<input type="button" value="Save" class="button" onclick="javascript:onSave();"/>
+			<input type="button" value="Clear All" class="button" onclick="javascript:onClearAll();"/>
+ 			<a href="help2.html" target="_blank">Help</a><span>(try using Chrome)</span>
+		</div>
+
+		<div class="footer"></div>
+	</div>
+	<!-- objects list -->
+	<div id="tabs" class="tabs">
+		<div class="tab" id="tabIndex" 
+			onclick="javascript:onShowIndex();"
+			>Index</div>
+		<div class="tab" id="tabSequences" 
+			onclick="javascript:onShowSequences();" 
+			>Sequences</div>
+		<div class="tab" id="newSketch" 
+			onclick="javascript:onNewObject();" 
+			>New Sketch</div>
+		<div class="footer"></div>
+	</div>
+	<!--  object index -->
+	<div id="index" class="index tabview" style="display:none">
+		<div id='indexHashtags' class="indexHeader">
+			<div class="headerItem">
+				<span class="label">Filter:</span><input type="text" id="indexFilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();"/>
+				<input type='button' value='Show All' class='button' onclick='javascript:onObjectFilterClear();'/>
+			</div>
+			<div id='indexHashtagsMarker'></div>
+			<div class="footer"></div>
+		</div>
+		<canvas id="indexCanvas" class="indexCanvas" ></canvas>								
+	</div>
+	<!-- sequences -->
+	<div id="sequences" class="index tabview">
+		<div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Sequences(1)</span>
+					</div>
+					<div class="headerItem">
+						<span class="label">Filter:</span><input type="text" id="sequences1FilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();" disabled/>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<div id="sequences1Div" class="sequencesDiv" ></div>								
+			</div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Sequences(2)</span>
+					</div>
+					<div class="headerItem">
+						<span class="label">Filter:</span><input type="text" id="sequences2FilterText" value="" class="filterText" onchange="javascript:onObjectFilterChanges();" disabled/>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<div id="sequences2Div" class="sequencesDiv" >
+					<div id="addSequence" onclick="javascript:onNewSequence();">New Sequence</div>
+				</div>								
+			</div>
+			<div class="sequencesColumn">
+				<div class="indexHeader">
+					<div class="headerItem">
+						<span class="label">Current frame view</span>
+					</div>
+
+					<div class="footer"></div>
+				</div>
+				<canvas id="sequencesViewCanvas" class="sequencesViewCanvas" ></canvas>								
+			</div>
+		</div>
+	</div>
+	<!-- object editor -->
+	<div class="editor tabview" id="editor">
+		<!-- left column -->
+		<div class="editorLeft">
+			<!-- overview -->
+			<p class="label">Overview</p>
+	   	  <canvas id="objectOverviewCanvas" class="overviewCanvas" ></canvas>				
+			<!-- hidden text -->
+			<p class="label">Description</p>
+	    	<!-- <canvas id="objectTextCanvas" class="textCanvas" ></canvas> -->
+    		<textarea id='objectTextArea' class='objectTextArea' rows="6" cols="20" wrap="soft"></textarea>
+    		<table class="sketchPropertiesTable">
+				<tr class="sketchProperty"><td>Background</td>
+					<td>
+						<div class="action" id="setBackgroundAction">Set</div>
+						<div class="action" id="clearBackgroundAction">Clear</div>
+					</td>
+				</tr>
+				<tr class="sketchProperty" id="backgroundAlphaProperty"><td>Fade</td>
+					<td>
+						<div class="alpha" style="background-color:#000000"></div>
+						<div class="alpha" style="background-color:#404040"></div>
+						<div class="alpha" style="background-color:#808080"></div>
+						<div class="alpha" style="background-color:#a0a0a0"></div>
+						<div class="alpha" style="background-color:#c0c0c0"></div>
+						<div class="alpha" style="background-color:#e0e0e0"></div>
+					</td>
+				</tr>
+    		</table>
+		</div>
+		<!-- right / zoomable view -->
+		<div class="editorDetail">
+			
+    	  <canvas id="objectDetailCanvas" class="detailCanvas" ></canvas>
+				
+	  </div>
+		<div class="footer">        <input type ="image" src ="t1.png" width="100"height="30" id="hide";'>
+	</div>
+	<!-- common facilities -->
+  </div>
+	<div class="commonFacilities">
+	  <div id="box" class="properties">
+	    <table class="propertiesTable">
+	      <tr class="propertyTitle" >
+	        <td>Properties</td>
+	        <td><!-- Value -->
+	          <div class="propertiesShow" id="propertiesShowSelection">Selection</div>
+	          <div class="propertiesShow" id="propertiesShowNew">New Items</div></td>
+          </tr>
+	      <tr class="property" id="textProperty">
+	        <td>Text</td>
+	        <td><input id="orphanText" type="text" width="20"/></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="showLabelProperty">
+	        <td>Show Label</td>
+	        <td><div class="option optionDefault optionSelected" id="showLabel_">None</div>
+	          <div class="option" id="showLabel_sketch">Sketch</div>
+	          <div class="option" id="showLabel_frame">Frame</div>
+	          <div class="option" id="showLabel_sketch_frame">Both</div></td>
+          </tr>
+	      <!-- font size -->
+	      <tr class="property propertyDisabled" id="textSizeProperty">
+	        <td>Font Size</td>
+	        <td><div class="option optionDefault optionSelected" id="textSize_12">12</div>
+	          <div class="option" id="textSize_24">24</div>
+	          <div class="option" id="textSize_48">48</div>
+	          <div class="option" id="textSize_96">96</div></td>
+	        </select>
+          </tr>
+	      <tr class="property propertyDisabled" id="textColorProperty">
+	        <td>Text Color</td>
+	        <td><div class="option optionDefault optionSelected" style="background-color:#000000" id="textColor_000000"></div>
+	          <div class="option" style="background-color:#ffffff" id="textColor_ffffff"></div>
+	          <div class="option" style="background-color:#808080" id="textColor_808080"></div>
+	          <div class="option" style="background-color:#ff0000" id="textColor_ff0000"></div>
+	          <div class="option" style="background-color:#00ff00" id="textColor_00ff00"></div>
+	          <div class="option" style="background-color:#0000ff" id="textColor_0000ff"></div>
+	          <div class="option" style="background-color:#ffff00" id="textColor_ffff00"></div></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="textVAlignProperty">
+	        <td>Text Align</td>
+	        <td><div class="option optionDefault optionSelected" id="textVAlign_above">Above</div>
+	          <div class="option" id="textVAlign_top">Top</div>
+	          <div class="option" id="textVAlign_middle">Mid</div>
+	          <div class="option" id="textVAlign_bottom">Bottom</div>
+	          <div class="option" id="textVAlign_below">Below</div></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="frameStyleProperty">
+	        <td>Style</td>
+	        <td><div class="option optionDefault optionSelected" id="frameStyle_">None</div>
+	          <div class="option" id="frameStyle_border">Border</div>
+	          <div class="option" id="frameStyle_fill">Fill</div>
+	          <div class="option" id="frameStyle_border_fill">Both</div></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="lineColorProperty">
+	        <td>Line Color</td>
+	         <!--<td><div class="preview"></div>
+	          colorpicker element 
+	          <div class="colorpicker" style="display:none">
+	            <canvas id="picker" var="1" width="300" height="300"></canvas>
+	            <div class="controls">
+	              <div>
+	                <label>R</label>
+	                <input type="text" id="rVal" />
+                  </div>
+	              <div>
+	                <label>G</label>
+	                <input type="text" id="gVal" />
+                  </div>
+	              <div>
+	                <label>B</label>
+	                <input type="text" id="bVal" />
+                  </div>
+	              <div>
+	                <label>RGB</label>
+	                <input type="text" id="rgbVal" />
+                  </div>
+	              <div>
+	                <label>HEX</label>
+	                <input type="text" id="hexVal" />
+                  </div>
+                </div>
+              </div></td>--> 
+	              <td>
+						 <div class="option optionDefault optionSelected" style="background-color:#000000" id="lineColor_000000"></div>
+						<div class="option" style="background-color:#ffffff" id="lineColor_ffffff"></div>
+						<div class="option" style="background-color:#808080" id="lineColor_808080"></div>
+						<div class="option" style="background-color:#ff0000" id="lineColor_ff0000"></div>
+						<div class="option" style="background-color:#00ff00" id="lineColor_00ff00"></div>
+						<div class="option" style="background-color:#0000ff" id="lineColor_0000ff"></div>
+						<div class="option" style="background-color:#ffff00" id="lineColor_ffff00"></div>
+					</td>
+          </tr>
+	      <!--  line width -->
+	      <tr class="property propertyDisabled" id="lineWidthProperty">
+	        <td>Line Width</td>
+	        <td><div class="option optionDefault optionSelected" id="lineWidth_1">1</div>
+	          <div class="option" id="lineWidth_2">2</div>
+	          <div class="option" id="lineWidth_4">4</div>
+	          <div class="option" id="lineWidth_8">8</div></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="fillColorProperty">
+	        <td>Fill Color</td>
+	        <td><div class="option optionDefault optionSelected" style="background-color:#000000" id="fillColor_000000"></div>
+	          <div class="option" style="background-color:#ffffff" id="fillColor_ffffff"></div>
+	          <div class="option" style="background-color:#808080" id="fillColor_808080"></div>
+	          <div class="option" style="background-color:#ff0000" id="fillColor_ff0000"></div>
+	          <div class="option" style="background-color:#00ff00" id="fillColor_00ff00"></div>
+	          <div class="option" style="background-color:#0000ff" id="fillColor_0000ff"></div>
+	          <div class="option" style="background-color:#ffff00" id="fillColor_ffff00"></div></td>
+          </tr>
+	      <tr class="property propertyDisabled" id="rescaleProperty">
+	        <td>Rescale</td>
+	        <td><div class="option optionDefault optionSelected" id="rescale_fit">Fit</div>
+	          <div class="option" id="rescale_stretch">Stretch</div></td>
+          </tr>
+        </table>
+      </div>
+	  <div style="width:80%;float:left">
+		  <div class="actions">
+				<div class="action actionSelected" id="selectAction"><img src="select.jpg" width="31" height="31" title ="[Q] Select sketch in history and canvas" /></div>
+				<div class="action" id="backAction"><img src="Arrow back.jpg" width="31" height="31" title ="[Backspace]revert back to the previous sketch or index of sketches" /></div>
+				
+				<div class="action" id="panAction"><img src="select_pan.jpg" width="31" height="31" title ="[C] click and hold the sketch then move without zoom" /></div>
+				<div class="action" id="showAllAction"><img src="show all.png" width="31" height="31" title ="[V] click into the sketch" /></div>
+				<div class="action"  id="zoomInAction"><img src="zoom_in.png" width="31" height="31" title ="Zoom-in[Z]" /></div>
+				<div class="action" id="zoomOutAction"><img src="zoom_out.png" width="31" height="31" title ="Zoom-out[X]" /></div>
+				<div class="action actionDisabled" id="orderToBackAction"><img src="Back.jpg" width="31" height="31" title ="To back[W]" /></div>
+				<div class="action actionDisabled" id="addLineAction"><img src="Line.png" width="31" height="31" title ="Line[A]" /></div>
+				
+				<div class="action actionDisabled" id="addTextAction" onclick="return TextCheck()"><img src="text.png" width="31" height="31" title ="Text[S]" /></div>
+				<div class="action actionDisabled" id="addFrameAction" onclick="FrameCheck()"><img src="frame.png" width="31" height="31" title ="Frame[F]" /></div>
+				<div class="action actionDisabled" id="addCircleAction"><img src="circle.png" width="31" height="31" title ="Circle[J]" /></div>
+				
+				<div class="action" id="editAction"><img src="open.png" width="31" height="31" title ="[E] open corresponding webpage in browser" /></div>
+				<div class="action" id="moveAction"><img src="move.jpg" width="31" height="31" title ="Move[E]" /></div>
+				<div class="action" id="copyAction"><img src="copy.png" width="31" height="31" title ="Copy[D]" /></div>
+				<div class="action" id="placeAction"><img src="link.png" width="31" height="31" title ="[D] link the desired frame into the new sequence" /></div>
+				<div class="action" id="deleteAction"><img src="delete.jpg" width="31" height="31" title ="Delete" /></div>
+		</div>
+
+			<div class="selectionHistory">
+				<!-- selection history -->
+			  <div class="indexHeader">
+				  <div class="headerItem">
+					  SELECTION HISTORY</br>
+						Load Image:
+						<input type="button" class="button" value="From URL" onclick="javascript:onLoadImageFromURL()"/>
+						<input type="file" id="loadImage" name="imageFiles[]" accept="image/*" class="button" onclick="ImageCheck()"/>
+						
+		          </div>
+					<div class="footer"></div>
+				</div>
+			  <canvas id="selectionCanvas" class="selectionCanvas" ></canvas>	
+			</div>
+		<div class="footer"></div>
+	</div>
+</div>
+</div>
+<div id="ppitest" style="width:1in;visible:hidden;padding:0px"></div>
+<div id="hiddenimages" style="display:none"></div>
+</body>
+</html>

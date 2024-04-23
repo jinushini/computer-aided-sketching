@@ -1,0 +1,23 @@
+<html>
+<head>
+<SCRIPT LANGUAGE="javascript">
+<!--
+function scan() {
+  ImScan.FileType = 1;	 // TIFF
+  ImScan.Image = "c:\images.tif";
+  ImScan.ScanTo = 1;	 // DisplayAndFile=1, FileOnly=2
+  ImScan.OpenScanner();
+  ImScan.StartScan();
+  ImScan.CloseScanner();
+}
+//-->
+</SCRIPT>
+</head>
+
+<body>
+<INPUT type=button value="scanner" onclick="scan()"><br>
+
+<object classid="clsid:84926CA0-2941-101C-816F-0E6013114B7F" id="ImScan" width="32" height="32">
+</object>
+</body>
+</html>

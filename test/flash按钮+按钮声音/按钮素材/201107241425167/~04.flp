@@ -1,0 +1,7 @@
+<flash_project name="~04" version="1">
+    <project_file path="./~04.fla" filetype="fla" profile="" />
+    <project_file path="./.\mx\transitions\OnEnterFrameBeacon.as" filetype="as" />
+    <project_file path="./.\mx\transitions\BroadcasterMX.as" filetype="as" />
+    <project_file path="./.\mx\transitions\Tween.as" filetype="as" />
+    <project_file path="./.\mx\transitions\easing\Strong.as" filetype="as" />
+</flash_project>

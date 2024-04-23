@@ -1,0 +1,32 @@
+//
+function closeopen(closeopen){
+  var y = sub.downsethight;
+  y += closeopen*5;
+  if(y>=450){
+   clearEx(b);
+   sub.style.height = "450px";
+   f = true;
+  }
+  else if(y<=30){
+   clearEx(b);
+   sub.style.height = "30px";
+   f = true;
+  }
+  else sub.style.height = y + "px";
+ }
+function getproproty(){
+ document.getElementById("headerItem").onclick = function(){
+   clearEx(b);
+
+   if(sub.downsethight>=450)
+      b=setEx("closeopen(-1)",5);
+   else
+      b = setEx("closeopen(1)" , 5); 
+  }
+}
+window.onload = function()
+{
+ sub = document.getElementById("headerItem")
+ sub.style.height = "30px";
+ getproproty();
+}
